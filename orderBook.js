@@ -1,13 +1,42 @@
 // take in incoming order and existing book
+const reconcileOrder = (book, newOrder) => {
+  // set up book to return 
+  const updatedBook = []
 
-// take apart the incoming order, grab type, quantity, and price
+  // If empty, add order to book.
+  if (book.length === 0) {
+    updatedBook.push(newOrder)
 
-// loop over existing book. 
+    return updatedBook
+  }
+  else {
+    return readBook(book, newOrder)
+  }
+}
 
-// If empty, add order to book.
-// if type matches all exisitng orders, add order to book.
-// if type does not match all, check quantity & price of each where types are not equal (start at the 
-//      beginning of the book).
+// otherwise, loop over existing book.
+const readBook = (book, newOrder) => {
+  let updatedBook = []
+  let updatedOrder = newOrder
+
+  for (let i = 0; i < book.length; i++) {
+    // if type does not match all, check quantity & price of each where types are not equal (start at the
+    //      beginning of the book).
+    if (newOrder.type !== book[i].type) {
+      // more testing
+      // from whatever function, return the updatedOrder to add to the order book, and the updated book.
+    }
+    // IF types are EQUAL, run through loop again, but add the current order being tested to updated book.
+    else {
+      updatedBook.push(book[i])
+    }
+  }
+  // push the updated order to the updatedBook. if types are equal, updatedOrder did not change. 
+  //    if types were unequal, updated order will have changed and existing orders will have changed.
+  updatedBook.push(updatedOrder)
+
+  return updatedBook
+}
 
 // do the following for unmatched types:
 
@@ -23,3 +52,4 @@
 //      the existing order in the book
 
 // if neither price nor quantity match, add the order to the book. (extra credit may apply here? (partial orders))
+module.exports = reconcileOrder
