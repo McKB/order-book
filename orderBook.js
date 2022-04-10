@@ -1,39 +1,35 @@
-// take in incoming order and existing book
+// reconcileOrder // 
 const reconcileOrder = (book, newOrder) => {
-  // set up book to return 
-  const updatedBook = []
+  let updatedBook = []
 
-  // If empty, add order to book.
+  // Empty Book? //
   if (book.length === 0) {
     updatedBook.push(newOrder)
-
-    return updatedBook
   }
   else {
-    return readBook(book, newOrder)
+    updatedBook = readBook(book, newOrder)
   }
+
+  return updatedBook
 }
 
-// otherwise, loop over existing book.
+// readBook //
 const readBook = (book, newOrder) => {
   let updatedBook = []
   let updatedOrderArray = [newOrder]
 
   for (let i = 0; i < book.length; i++) {
-    // if type does not match all, check quantity & price of each where types are not equal (start at the
-    //      beginning of the book).
-    if (newOrder.type !== book[i].type) {
-      // more testing
-      // from whatever function, return the updatedOrder to add to the order book, and the updated book.
-      updatedOrderArray = buyOrSell(book[i], newOrder)
+    let existingOrder = book[i]
+
+    if (newOrder.type !== existingOrder.type) {
+      updatedOrderArray = buyOrSell(existingOrder, newOrder)
     }
-    // IF types are EQUAL, run through loop again, but add the current order being tested to updated book.
+
     else {
-      updatedBook.push(book[i])
+      updatedBook.push(existingOrder)
     }
   }
-  // push the updated order to the updatedBook. if types are equal, updatedOrder did not change. 
-  //    if types were unequal, updated order will have changed and existing orders will have changed.
+
   for (let i = 0; i < updatedOrderArray.length; i++) {
     let updatedOrder = updatedOrderArray[i]
 
@@ -44,28 +40,28 @@ const readBook = (book, newOrder) => {
 }
 
 // do the following for unmatched types:
-
 // if both quantity and price match one exisitng order, remove that order from existing book and end the search.
 // if quantity matches but price does not, check the rest, then add the order to book. (add extra credit here)
 // if quantity does not match but price does, more testing is required.
 // if neither price nor quantity match, add the order to the book. (extra credit may apply here? (partial orders))
+
+// buyOrSell //
 const buyOrSell = (existingOrder, newOrder) => {
   let updatesArray = []
 
-  if (existingOrder.price === newOrder.price && existingOrder.quantity === newOrder.quantity) {
-    return updatesArray
-  }
-  else if (existingOrder.price === newOrder.price) {
-    updatesArray = partialBuy(existingOrder, newOrder)
-
-    return updatesArray
-  }
-  else {
+  if (existingOrder.price !== newOrder.price && existingOrder.quantity !== newOrder.quantity) {
     updatesArray.push(existingOrder)
     updatesArray.push(newOrder)
-
-    return updatesArray
   }
+  else if (existingOrder.price === newOrder.price && existingOrder.quantity !== newOrder.quantity) {
+    updatesArray = partialBuy(existingOrder, newOrder)
+  }
+  else if (existingOrder.price !== newOrder.price && existingOrder.quantity === newOrder.quantity) {
+    updatesArray.push(existingOrder)
+    updatesArray.push(newOrder)
+  }
+
+  return updatesArray
 }
 
 // 1. if quantity in existing book is smaller, partially fulfill the incoming order, 
@@ -74,6 +70,8 @@ const buyOrSell = (existingOrder, newOrder) => {
 //      If price matches another, run through the parent if-statement again. 
 // 2. if quantity in existing book is larger, fulfill the incoming order and reduce
 //      the existing order in the book
+
+// partialBuy // 
 const partialBuy = (existingOrder, newOrder) => {
   let orderArray = []
   let updatedNewOrder = newOrder
@@ -90,6 +88,5 @@ const partialBuy = (existingOrder, newOrder) => {
 
   return orderArray
 }
-
 
 module.exports = reconcileOrder
