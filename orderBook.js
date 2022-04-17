@@ -23,6 +23,11 @@ const readBook = (book, newOrder) => {
 
     if (newOrder.type !== existingOrder.type) {
       updatedOrderArray = buyOrSell(existingOrder, newOrder)
+      // if noDealFlag is set to true, add existing order to book & reset updatedOrderArray
+      if (updatedOrderArray[0] === true) {
+        updatedBook.push(existingOrder)
+        updatedOrderArray = [newOrder]
+      }
     }
 
     else {
@@ -30,11 +35,7 @@ const readBook = (book, newOrder) => {
     }
   }
 
-  for (let i = 0; i < updatedOrderArray.length; i++) {
-    let updatedOrder = updatedOrderArray[i]
-
-    updatedBook.push(updatedOrder)
-  }
+  updatedBook.push(...updatedOrderArray)
 
   return updatedBook
 }
@@ -50,15 +51,13 @@ const buyOrSell = (existingOrder, newOrder) => {
   let updatesArray = []
 
   if (existingOrder.price !== newOrder.price && existingOrder.quantity !== newOrder.quantity) {
-    updatesArray.push(existingOrder)
-    updatesArray.push(newOrder)
+    updatesArray.push(existingOrder, newOrder)
   }
   else if (existingOrder.price === newOrder.price && existingOrder.quantity !== newOrder.quantity) {
     updatesArray = partialBuy(existingOrder, newOrder)
   }
   else if (existingOrder.price !== newOrder.price && existingOrder.quantity === newOrder.quantity) {
-    updatesArray.push(existingOrder)
-    updatesArray.push(newOrder)
+    updatesArray = getDeal(existingOrder, newOrder)
   }
 
   return updatesArray
@@ -84,6 +83,21 @@ const partialBuy = (existingOrder, newOrder) => {
   else {
     updatedExistingOrder.quantity -= newOrder.quantity
     orderArray.push(updatedExistingOrder)
+  }
+
+  return orderArray
+}
+
+// getDeal (extra credit) // 
+const getDeal = (existingOrder, newOrder) => {
+  let orderArray = []
+  let noDealFlag = true
+
+  if (existingOrder.type === 'buy' && existingOrder.price < newOrder.price) {
+    orderArray.push(noDealFlag, existingOrder, newOrder)
+  }
+  else if (existingOrder.type === 'sell' && existingOrder.price > newOrder.price) {
+    orderArray.push(noDealFlag, existingOrder, newOrder)
   }
 
   return orderArray
