@@ -3,7 +3,7 @@ const reconcileOrder = (book, newOrder) => {
   let updatedBook = []
 
   // Empty Book? //
-  if (book.length === 0) {
+  if (!book.length) {
     updatedBook.push(newOrder)
   }
   else {
@@ -16,12 +16,10 @@ const reconcileOrder = (book, newOrder) => {
 // readBook //
 const readBook = (book, newOrder) => {
   let updatedBook = []
-  let updatedOrderArray = [newOrder]
+  let updatedOrderArray = [newOrder] // if no changes are made, this is the only update
 
-  for (let i = 0; i < book.length; i++) {
-    let existingOrder = book[i]
-
-    if (newOrder.type !== existingOrder.type) {
+  for (let existingOrder of book) {
+    if (!equalType(existingOrder, newOrder)) {
       updatedOrderArray = buyOrSell(existingOrder, newOrder)
       // if noDealFlag is set to true, add existing order to book & reset updatedOrderArray
       if (updatedOrderArray[0] === true) {
@@ -29,7 +27,6 @@ const readBook = (book, newOrder) => {
         updatedOrderArray = [newOrder]
       }
     }
-
     else {
       updatedBook.push(existingOrder)
     }
@@ -50,14 +47,18 @@ const readBook = (book, newOrder) => {
 const buyOrSell = (existingOrder, newOrder) => {
   let updatesArray = []
 
-  if (existingOrder.price !== newOrder.price && existingOrder.quantity !== newOrder.quantity) {
+  if (noDeal(existingOrder, newOrder)) {
     updatesArray.push(existingOrder, newOrder)
   }
-  else if (existingOrder.price === newOrder.price && existingOrder.quantity !== newOrder.quantity) {
+  else if (partialDeal(existingOrder, newOrder)) {
     updatesArray = partialBuy(existingOrder, newOrder)
   }
-  else if (existingOrder.price !== newOrder.price && existingOrder.quantity === newOrder.quantity) {
-    updatesArray = getDeal(existingOrder, newOrder)
+  else if (bargainDeal(existingOrder, newOrder)) {
+    let noDealFlag = greatDeal(existingOrder, newOrder)
+
+    if (noDealFlag) {
+      updatesArray.push(noDealFlag)
+    }
   }
 
   return updatesArray
@@ -88,19 +89,20 @@ const partialBuy = (existingOrder, newOrder) => {
   return orderArray
 }
 
-// getDeal (extra credit) // 
-const getDeal = (existingOrder, newOrder) => {
-  let orderArray = []
-  let noDealFlag = true
+const equalType = (existingOrder, newOrder) => existingOrder.type === newOrder.type
 
-  if (existingOrder.type === 'buy' && existingOrder.price < newOrder.price) {
-    orderArray.push(noDealFlag, existingOrder, newOrder)
-  }
-  else if (existingOrder.type === 'sell' && existingOrder.price > newOrder.price) {
-    orderArray.push(noDealFlag, existingOrder, newOrder)
-  }
+// eslint-disable-next-line max-len
+const greatDeal = (existingOrder, newOrder) => (existingOrder.type === 'buy' && existingOrder.price < newOrder.price) || (existingOrder.type === 'sell' && existingOrder.price > newOrder.price)
 
-  return orderArray
-}
+// eslint-disable-next-line max-len
+const partialDeal = (existingOrder, newOrder) => existingOrder.quantity !== newOrder.quantity && existingOrder.price === newOrder.price
+
+// eslint-disable-next-line max-len
+const bargainDeal = (existingOrder, newOrder) => existingOrder.quantity === newOrder.quantity && existingOrder.price !== newOrder.price
+
+// eslint-disable-next-line max-len
+const noDeal = (existingOrder, newOrder) => existingOrder.quantity !== newOrder.quantity && existingOrder.price !== newOrder.price
+
+
 
 module.exports = reconcileOrder
