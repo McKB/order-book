@@ -15,33 +15,25 @@ const reconcileOrder = (book, newOrder) => {
 
 // readBook //
 const readBook = (book, newOrder) => {
-  let updatedBook = []
-  let updatedOrderArray = [newOrder] // if no changes are made, this is the only update
+  let newBook = []
+  let updates = [newOrder]
 
   for (let existingOrder of book) {
-    if (!equalType(existingOrder, newOrder)) {
-      updatedOrderArray = buyOrSell(existingOrder, newOrder)
-      // if noDealFlag is set to true, add existing order to book & reset updatedOrderArray
-      if (updatedOrderArray[0] === true) {
-        updatedBook.push(existingOrder)
-        updatedOrderArray = [newOrder]
-      }
+    if (equalType(existingOrder, newOrder)) {
+      newBook.push(existingOrder)
     }
     else {
-      updatedBook.push(existingOrder)
+      updates = buyOrSell(existingOrder, newOrder)
+      if (noChanges(updates)) {
+        newBook.push(existingOrder)
+        updates = [newOrder]
+      }
     }
   }
+  newBook.push(...updates)
 
-  updatedBook.push(...updatedOrderArray)
-
-  return updatedBook
+  return newBook
 }
-
-// do the following for unmatched types:
-// if both quantity and price match one exisitng order, remove that order from existing book and end the search.
-// if quantity matches but price does not, check the rest, then add the order to book. (add extra credit here)
-// if quantity does not match but price does, more testing is required.
-// if neither price nor quantity match, add the order to the book. (extra credit may apply here? (partial orders))
 
 // buyOrSell //
 const buyOrSell = (existingOrder, newOrder) => {
@@ -57,19 +49,12 @@ const buyOrSell = (existingOrder, newOrder) => {
     let noDealFlag = greatDeal(existingOrder, newOrder)
 
     if (noDealFlag) {
-      updatesArray.push(noDealFlag)
+      updatesArray.push(existingOrder, newOrder)
     }
   }
 
   return updatesArray
 }
-
-// 1. if quantity in existing book is smaller, partially fulfill the incoming order, 
-//      remove the existing order, keep looking through existing book for another matching price. 
-//      If no more matching price, and add remainder of incoming to order book. 
-//      If price matches another, run through the parent if-statement again. 
-// 2. if quantity in existing book is larger, fulfill the incoming order and reduce
-//      the existing order in the book
 
 // partialBuy // 
 const partialBuy = (existingOrder, newOrder) => {
@@ -90,6 +75,8 @@ const partialBuy = (existingOrder, newOrder) => {
 }
 
 const equalType = (existingOrder, newOrder) => existingOrder.type === newOrder.type
+
+const noChanges = (array) => array.length === 2
 
 // eslint-disable-next-line max-len
 const greatDeal = (existingOrder, newOrder) => (existingOrder.type === 'buy' && existingOrder.price < newOrder.price) || (existingOrder.type === 'sell' && existingOrder.price > newOrder.price)
