@@ -2,7 +2,6 @@
 const reconcileOrder = (book, newOrder) => {
   let updatedBook = []
 
-  // Empty Book? //
   if (!book.length) {
     updatedBook.push(newOrder)
   }
@@ -78,16 +77,13 @@ const equalType = (existingOrder, newOrder) => existingOrder.type === newOrder.t
 
 const noChanges = (array) => array.length === 2
 
-// eslint-disable-next-line max-len
+/* eslint-disable max-len */
 const greatDeal = (existingOrder, newOrder) => (existingOrder.type === 'buy' && existingOrder.price < newOrder.price) || (existingOrder.type === 'sell' && existingOrder.price > newOrder.price)
 
-// eslint-disable-next-line max-len
 const partialDeal = (existingOrder, newOrder) => existingOrder.quantity !== newOrder.quantity && existingOrder.price === newOrder.price
 
-// eslint-disable-next-line max-len
 const bargainDeal = (existingOrder, newOrder) => existingOrder.quantity === newOrder.quantity && existingOrder.price !== newOrder.price
 
-// eslint-disable-next-line max-len
 const noDeal = (existingOrder, newOrder) => existingOrder.quantity !== newOrder.quantity && existingOrder.price !== newOrder.price
 
 
